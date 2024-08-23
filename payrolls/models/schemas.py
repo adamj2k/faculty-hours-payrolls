@@ -1,6 +1,4 @@
-from typing import List
-
-from pydantic import BaseModel, EmailStr, Field, computed_field
+from pydantic import BaseModel, EmailStr
 
 
 class temp(BaseModel):
