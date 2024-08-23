@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "fh-payrolls"
+version = "0.1.0"
+description = "payrolls service"
+authors = ["Adam <adamjawor@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.11"
+fastapi = "^0.109.2"
+uvicorn = "^0.27.1"
+python-dotenv = "~1.0"
+httpx = "^0.27.0"
+itsdangerous = "^2.1.2"
+pytest = "^8.3.2"
+strawberry-graphql = "^0.237.3"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+isort = "*"
+pre-commit = "~3.6"
+python-dotenv = "^1.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+exclude = '''
+(
+    /(
+        \.git
+      | \.hg
+      | \.mypy_cache
+      | \.tox
+      | \.env
+      | _build
+      | buck-out
+      | build
+      | dist
+    )/
+  | .*/migrations
+  | .*/settings
+  | .*/__init__.py
+  | .*/static
+  | .*/media
+)
+'''
+
+[tool.isort]
+profile = "black"
+skip = ["**/migrations", "**/settings", "**/__init__.py", "**/static", "**/media"]
