@@ -1,2 +1,2 @@
 # faculty-hours-payrolls
-Payroll service for FH-app 
+Payroll service for FH-app
