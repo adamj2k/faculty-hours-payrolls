@@ -1,6 +1,6 @@
 name: faculty-hours-payrolls
 services:
-  web:
+  payrolls:
     env_file:
       - .env
     build:
