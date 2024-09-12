@@ -1,4 +1,6 @@
 import pandas as pd
+from models.database import get_db
+from models.models import MonthPayrolls
 
 
 def get_data_to_count_payrolls(personal_report: pd.DataFrame, wages: pd.DataFrame) -> pd.DataFrame:
@@ -37,4 +39,17 @@ def count_payrolls(data: pd.DataFrame, year: int, month: int) -> pd.DataFrame:
 
 
 def save_payrolls_to_database(payrolls: pd.DataFrame) -> None:
-    pass
+    """
+    Save payrolls to database.
+
+    Args:
+        payrolls (pd.DataFrame): DataFrame containing payrolls data.
+
+    Returns:
+        None
+    """
+    db = get_db()
+    payrolls_to_save = MonthPayrolls(**payrolls.model_dump())
+    db.add(payrolls_to_save)
+    db.commit()
+    db.refresh(payrolls_to_save)
