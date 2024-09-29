@@ -2,6 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from payrolls.routers import payrolls_endpoints
+
 app = FastAPI()
 
 origins = [
@@ -17,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(payrolls_endpoints.router, prefix="/payrolls")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8300, reload=True)
