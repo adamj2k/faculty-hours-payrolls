@@ -78,10 +78,7 @@ def check_payroll_in_database(year: int, month: int) -> bool:
     """
     db = get_db
     month_payrolls = db.query(MonthPayrolls).filter(MonthPayrolls.year == year, MonthPayrolls.month == month).first()
-    if month_payrolls == None:
-        return False
-    else:
-        return True
+    return month_payrolls is not None
 
 
 def get_list_of_teachers_from_personal_reports_list(personal_report_for_all_teachers: list) -> list:
