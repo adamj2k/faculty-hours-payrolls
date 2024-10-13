@@ -1,6 +1,6 @@
 import pandas as pd
 
-from payrolls.models.database import get_db
+from payrolls.models.database import SessionLocal, get_db
 from payrolls.models.models import MonthPayrolls
 from payrolls.routers.get_data import get_personal_reports_list
 
@@ -8,6 +8,8 @@ from payrolls.routers.get_data import get_personal_reports_list
 def get_wages_for_teachers(teacher_list: list) -> pd.DataFrame:
     db = get_db()
     all_wages = pd.read_sql("wages", db.bind)
+    if all_wages.empty:
+        return None  # TODO raise exception
     teachers_wages = all_wages.loc[teacher_list]
     return teachers_wages
 
@@ -76,7 +78,7 @@ def check_payroll_in_database(year: int, month: int) -> bool:
     Returns:
         bool: True if payroll exists, False otherwise.
     """
-    db = get_db
+    db = SessionLocal()
     month_payrolls = db.query(MonthPayrolls).filter(MonthPayrolls.year == year, MonthPayrolls.month == month).first()
     return month_payrolls is not None
 
