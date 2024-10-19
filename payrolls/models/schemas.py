@@ -2,8 +2,6 @@ from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
-from payrolls.models.models import MonthPayrolls, Wages
-
 
 class Wages(BaseModel):
     id: int
@@ -23,9 +21,6 @@ class MonthPayrolls(BaseModel):
     month: int = Field(ge=1, le=12)
     month_hours: int
     month_salary: Decimal = Field(decimal_places=2)
-
-    class Config:
-        orm_mode = True
 
 
 class MonthPayrollsResponse(BaseModel):

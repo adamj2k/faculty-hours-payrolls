@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from payrolls.main import app
-from payrolls.models.database import Base, get_db
+from payrolls.models import models
+from payrolls.models.database import get_db
 
 # SQLite database URL for testing
 SQLITE_DATABASE_URL = "sqlite:///./test_db.db"
@@ -27,7 +28,7 @@ def db_session():
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
-    Base.metadata.create_all(bind=connection)
+    models.Base.metadata.create_all(bind=engine)
     yield session
     session.close()
     transaction.rollback()
