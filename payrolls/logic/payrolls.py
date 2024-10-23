@@ -1,18 +1,20 @@
 import pandas as pd
 
-from payrolls.models.database import get_db
+from payrolls.models.database import SessionLocal
 from payrolls.models.models import MonthPayrolls
 from payrolls.routers.get_data import get_personal_reports_list
 
 
 def get_wages_for_teachers(teacher_list: list) -> pd.DataFrame:
-    db = get_db()
-    all_wages = pd.read_sql("wages", db.bind)
-    teachers_wages = all_wages.loc[teacher_list]
+    with SessionLocal() as db:
+        all_wages = pd.read_sql("wages", db.bind)
+        if all_wages.empty:
+            return None  # TODO raise exception
+    teachers_wages = all_wages.loc[all_wages["teacher_name"].isin(teacher_list)]
     return teachers_wages
 
 
-def get_data_to_count_payrolls(personal_report: pd.DataFrame, wages: pd.DataFrame) -> pd.DataFrame:
+def get_data_to_count_payrolls(personal_report: dict, wages: pd.DataFrame) -> pd.DataFrame:
     """
     Function to get data ready for counting payrolls. Join data from personal report and wages.
 
@@ -23,7 +25,8 @@ def get_data_to_count_payrolls(personal_report: pd.DataFrame, wages: pd.DataFram
     Returns:
         pd.DataFrame: A DataFrame containing the ready data to count payrolls.
     """
-    data = pd.merge(personal_report, wages, on_left="id", on_right="teacher_id")
+    df_personal_report = pd.DataFrame.from_dict(personal_report["personal_workload_report"])
+    data = pd.merge(df_personal_report, wages, left_on="teacher", right_on="teacher_name")
     return data
 
 
@@ -42,12 +45,26 @@ def count_payrolls_for_month_of_year(data: pd.DataFrame, year: int, month: int) 
     """
     data["year"] = year
     data["month"] = month
-    data["month_hours"] = data["hours"] / 12
-    data["month_payroll"] = data["month_hours"] * data["wage"]
+    data["month_hours"] = data["sum_hours"] / 12
+    data["month_salary"] = data["month_hours"] * data["wage"]
+    data.drop(
+        columns=[
+            "_id",
+            "teacher",
+            "hours_semester1",
+            "hours_semester2",
+            "sum_hours",
+            "difference_pensum_sum_hours",
+            "id",
+            "wage",
+            "pensum",
+        ],
+        inplace=True,
+    )
     return data
 
 
-def save_payrolls_to_database(payrolls: pd.DataFrame) -> None:
+def save_payrolls_to_database(payrolls: pd.DataFrame, db) -> None:
     """
     Save payrolls to database.
 
@@ -57,12 +74,10 @@ def save_payrolls_to_database(payrolls: pd.DataFrame) -> None:
     Returns:
         None
     """
-    db = get_db()
     payrolls_dict = payrolls.to_dict(orient="records")
-    payrolls_to_save = MonthPayrolls(**payrolls_dict.model_dump())
-    db.add(payrolls_to_save)
+    payrolls_to_save = [MonthPayrolls(**payroll) for payroll in payrolls_dict]
+    db.add_all(payrolls_to_save)
     db.commit()
-    db.refresh(payrolls_to_save)
 
 
 def check_payroll_in_database(year: int, month: int) -> bool:
@@ -76,7 +91,7 @@ def check_payroll_in_database(year: int, month: int) -> bool:
     Returns:
         bool: True if payroll exists, False otherwise.
     """
-    db = get_db
+    db = SessionLocal()
     month_payrolls = db.query(MonthPayrolls).filter(MonthPayrolls.year == year, MonthPayrolls.month == month).first()
     return month_payrolls is not None
 
@@ -86,8 +101,8 @@ def get_list_of_teachers_from_personal_reports_list(personal_report_for_all_teac
     Get list of teachers from personal report list.
     """
     list_of_teachers = []
-    for teacher in personal_report_for_all_teachers:
-        list_of_teachers.append(teacher["id"])
+    for teacher in personal_report_for_all_teachers["personal_workload_report"]:
+        list_of_teachers.append(teacher["teacher"])
     return list_of_teachers
 
 

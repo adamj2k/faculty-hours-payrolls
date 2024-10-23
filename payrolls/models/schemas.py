@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
+from decimal import Decimal
 
-from payrolls.models.models import MonthPayrolls, Wages
+from pydantic import BaseModel, Field
 
 
 class Wages(BaseModel):
@@ -20,10 +20,7 @@ class MonthPayrolls(BaseModel):
     year: int = Field(ge=2023)
     month: int = Field(ge=1, le=12)
     month_hours: int
-    month_payroll: float = Field(decimal_places=2)
-
-    class Config:
-        orm_mode = True
+    month_salary: Decimal = Field(decimal_places=2)
 
 
 class MonthPayrollsResponse(BaseModel):
@@ -33,7 +30,7 @@ class MonthPayrollsResponse(BaseModel):
     year: int = Field(ge=2023)
     month: int = Field(ge=1, le=12)
     month_hours: int
-    month_payroll: float = Field(decimal_places=2)
+    month_salary: Decimal = Field(decimal_places=2)
 
 
 class MonthPayrollsRequest(BaseModel):
