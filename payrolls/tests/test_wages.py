@@ -2,12 +2,11 @@ from payrolls.models.models import Wages
 
 
 def test_get_wage_existing_id(test_client, db_session):
-    # Create a wage in the database
+    # Test retrieving the wage with the existing ID
     wage = Wages(id=1, teacher_id=1, teacher_name="John Doe", wage=100.0)
     db_session.add(wage)
     db_session.commit()
 
-    # Test retrieving the wage with the existing ID
     response = test_client.get(f"/wage/{wage.id}")
     assert response.status_code == 200
     assert response.json() == {

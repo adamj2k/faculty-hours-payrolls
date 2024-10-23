@@ -3,14 +3,12 @@ from payrolls.models.schemas import MonthPayrollsResponse
 
 
 def test_get_month_payrolls_success(test_client, db_session):
-    # Create a sample payroll data
     payroll_data = MonthPayrolls(
         id=1, year=2024, month=1, teacher_id=1, teacher_name="John Doe", month_hours=100, month_salary=4000.0
     )
     db_session.add(payroll_data)
     db_session.commit()
 
-    # Test the function
     response = test_client.get(f"/month-payrolls/2024/1")
     assert response.status_code == 200
     assert response.json() == MonthPayrollsResponse(**payroll_data.__dict__).model_dump()

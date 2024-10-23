@@ -12,7 +12,7 @@ from payrolls.models.schemas import MonthPayrollsRequest, MonthPayrollsResponse,
 router = APIRouter()
 
 
-@router.post("/wage/create", status_code=status.HTTP_201_CREATED, response_model=Wages)
+@router.post("/wage", status_code=status.HTTP_201_CREATED, response_model=Wages)
 async def create_wage(wage_data: Wages, db: Session = Depends(get_db)):
     new_wage = models.Wages(**wage_data.model_dump())
     db.add(new_wage)
@@ -29,7 +29,7 @@ async def get_wage(wage_id: int, db: Session = Depends(get_db)):
     return wage
 
 
-@router.get("/wage/list/", response_model=list[Wages])
+@router.get("/wages", response_model=list[Wages])
 async def get_all_wages(db: Session = Depends(get_db)):
     all_wages = db.query(models.Wages).all()
     if all_wages is None:
