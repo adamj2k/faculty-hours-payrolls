@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from payrolls.models.database import init_db
 from payrolls.routers import payrolls_endpoints
 
 app = FastAPI()
@@ -23,5 +24,18 @@ app.add_middleware(
 
 app.include_router(payrolls_endpoints.router, prefix="/payrolls")
 
+
+@app.on_event("startup")
+async def startup_event():
+    init_db()
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8300, reload=True)
+    uvicorn.run(
+        "payrolls.main:app", host="0.0.0.0", port=8300, log_level="debug", access_log=False, use_colors=False, workers=1
+    )

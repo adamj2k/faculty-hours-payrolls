@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "payrolls service"
 authors = ["Adam <adamjawor@gmail.com>"]
 readme = "README.md"
+packages = [
+    { include = "payrolls" }
+]
 
 [tool.poetry.dependencies]
 python = "~3.11"
@@ -17,6 +20,7 @@ strawberry-graphql = "^0.237.3"
 sqlalchemy = "^2.0.35"
 pandas = "^2.2.3"
 psycopg2-binary = "^2.9.9"
+pre-commit = "^4.1.0"
 
 [tool.poetry.group.dev]
 optional = true
@@ -24,7 +28,7 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 black = "*"
 isort = "*"
-pre-commit = "~3.6"
+pre-commit = "^4.1.0"
 python-dotenv = "^1.0.1"
 
 [build-system]
