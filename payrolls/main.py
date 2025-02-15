@@ -1,3 +1,5 @@
+import sys
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,7 +29,9 @@ app.include_router(payrolls_endpoints.router, prefix="/payrolls")
 
 @app.on_event("startup")
 async def startup_event():
-    init_db()
+    # Skip database initialization during testing
+    if "pytest" not in sys.modules:
+        init_db()
 
 
 @app.get("/health")

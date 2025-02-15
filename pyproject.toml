@@ -21,6 +21,7 @@ sqlalchemy = "^2.0.35"
 pandas = "^2.2.3"
 psycopg2-binary = "^2.9.9"
 pre-commit = "^4.1.0"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev]
 optional = true
